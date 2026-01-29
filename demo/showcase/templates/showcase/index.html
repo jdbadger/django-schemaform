@@ -1,0 +1,240 @@
+{% extends "showcase/base.html" %}
+
+{% block title %}Django SchemaForm Showcase{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Hero Section -->
+        <div class="text-center mb-5">
+            {% load static %}
+            <img src="{% static 'showcase/img/djangoschemaform.png' %}" alt="Django SchemaForm" style="height: 100px;" class="mb-3">
+            <br/>
+            <span class="lead brand-accent">
+                Django Forms from Pydantic Models
+            </span>
+        </div>
+
+        <!-- Introduction -->
+        <div class="alert alert-primary" role="alert">
+            <h5 class="alert-heading">What is Django SchemaForm?</h5>
+            <p>
+                <code>SchemaForm</code> is a Django form class that automatically creates form fields 
+                from Pydantic schemas. It handles type mapping, validation, constraints, and more—all 
+                from your Pydantic model definitions.
+            </p>
+            <hr>
+            <p class="mb-0">
+                <strong>Try it out:</strong> Click on any form below to see the Pydantic schema alongside the generated form.
+            </p>
+        </div>
+
+        <!-- Features Section -->
+        <div class="mt-5">
+            <h2 class="h4 mb-3">Key Features</h2>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">🔄 Type Mapping</h6>
+                            <p class="card-text small">
+                                Python types automatically map to Django form fields: 
+                                <code>str</code> → <code>CharField</code>, 
+                                <code>EmailStr</code> → <code>EmailField</code>,
+                                <code>SecretStr</code> → Password input, etc.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">✅ Pydantic Validation</h6>
+                            <p class="card-text small">
+                                All Pydantic validation rules are enforced with user-friendly error messages.
+                                Supports <code>Field(min_length=..., ge=..., le=...)</code> and more.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">🎨 HTML5 Widgets</h6>
+                            <p class="card-text small">
+                                Date, time, datetime fields use native HTML5 pickers.
+                                <code>FutureDate</code> and <code>PastDate</code> set min/max attributes automatically.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">📝 Field Metadata</h6>
+                            <p class="card-text small">
+                                <code>Field(description=...)</code> becomes help text.
+                                <code>Field(title=...)</code> becomes the label.
+                                Docstrings are preserved.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Cards Grid -->
+        <h2 class="h4 mt-5">Demo Forms</h2>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for demo_form in forms %}
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ demo_form.name }}</h5>
+                        <p class="card-text text-muted flex-grow-1">{{ demo_form.description }}</p>
+                        <div class="mb-3">
+                            {% for badge in demo_form.badges %}
+                            <span class="badge bg-secondary badge-feature me-1">{{ badge }}</span>
+                            {% endfor %}
+                        </div>
+                        <a href="{% url demo_form.url %}" class="btn btn-primary mt-auto">
+                            Try This Form →
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Feature Coverage Table -->
+        <div class="mt-5">
+            <h2 class="h4 mb-3">Demo Form Features</h2>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped">
+                    <thead class="table-accent">
+                        <tr>
+                            <th>Feature</th>
+                            <th class="text-center">Contact</th>
+                            <th class="text-center">Registration</th>
+                            <th class="text-center">Booking</th>
+                            <th class="text-center">Review</th>
+                            <th class="text-center">Application</th>
+                            <th class="text-center">Medical</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>EmailStr</code></td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center">✓</td>
+                        </tr>
+                        <tr>
+                            <td><code>SecretStr</code> (Password)</td>
+                            <td class="text-center"></td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                        </tr>
+                        <tr>
+                            <td><code>Literal</code> / <code>Enum</code></td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center"></td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center"></td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center">✓</td>
+                        </tr>
+                        <tr>
+                            <td><code>date</code> / <code>time</code></td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center"></td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center">✓</td>
+                        </tr>
+                        <tr>
+                            <td><code>FutureDate</code> / <code>PastDate</code></td>
+                            <td class="text-center"></td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center">✓</td>
+                        </tr>
+                        <tr>
+                            <td><code>FutureDatetime</code></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center">✓</td>
+                        </tr>
+                        <tr>
+                            <td><code>Decimal</code></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center"></td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center"></td>
+                        </tr>
+                        <tr>
+                            <td><code>UUID</code></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                        </tr>
+                        <tr>
+                            <td><code>HttpUrl</code></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center"></td>
+                        </tr>
+                        <tr>
+                            <td><code>FileUpload</code> / <code>ImageUpload</code></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center"></td>
+                        </tr>
+                        <tr>
+                            <td>Cross-field validation</td>
+                            <td class="text-center"></td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                        </tr>
+                        <tr>
+                            <td>Constraints (<code>ge</code>, <code>le</code>, <code>min_length</code>)</td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center">✓</td>
+                            <td class="text-center">✓</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

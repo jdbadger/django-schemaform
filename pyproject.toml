@@ -1,0 +1,46 @@
+[project]
+name = "django-schemaform"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+license = "BSD-3-Clause"
+requires-python = ">=3.12"
+authors = [
+    {name = "Joe Badger"}
+]
+classifiers = [
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Framework :: Django :: 5.2",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+]
+dependencies = [
+    "django>=5.2,<6.0",
+    "pydantic[email]>=2.0,<3.0",
+]
+
+[dependency-groups]
+dev = [
+    "playwright>=1.57.0",
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+    "pytest-playwright>=0.7.2",
+    "pytest-testmon>=2.2.0",
+    "pytest-xdist>=3.8.0",
+    "ruff>=0.14.13",
+    "ty>=0.0.12",
+]
+
+[tool.pytest.ini_options]
+markers = [
+    "browser: marks tests as browser tests (run with Playwright)",
+]
