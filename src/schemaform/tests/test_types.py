@@ -16,14 +16,20 @@ class TestFileUploadType:
     def file_upload_metadata(self):
         """Extract FileUpload type metadata."""
         args = typing.get_args(FileUpload)
-        return {"origin": typing.get_origin(FileUpload), "base_type": args[0], "field_info": args[1]}
+        return {
+            "origin": typing.get_origin(FileUpload),
+            "base_type": args[0],
+            "field_info": args[1],
+        }
 
     def test_has_annotated_structure_with_binary_format(self, file_upload_metadata):
         """FileUpload is Annotated[Any, FieldInfo] with format='binary'."""
         assert file_upload_metadata["origin"] is typing.Annotated
         assert file_upload_metadata["base_type"] is typing.Any
         assert isinstance(file_upload_metadata["field_info"], FieldInfo)
-        assert file_upload_metadata["field_info"].json_schema_extra == {"format": "binary"}
+        assert file_upload_metadata["field_info"].json_schema_extra == {
+            "format": "binary"
+        }
 
 
 class TestImageUploadType:
@@ -33,14 +39,20 @@ class TestImageUploadType:
     def image_upload_metadata(self):
         """Extract ImageUpload type metadata."""
         args = typing.get_args(ImageUpload)
-        return {"origin": typing.get_origin(ImageUpload), "base_type": args[0], "field_info": args[1]}
+        return {
+            "origin": typing.get_origin(ImageUpload),
+            "base_type": args[0],
+            "field_info": args[1],
+        }
 
     def test_has_annotated_structure_with_image_format(self, image_upload_metadata):
         """ImageUpload is Annotated[Any, FieldInfo] with format='image'."""
         assert image_upload_metadata["origin"] is typing.Annotated
         assert image_upload_metadata["base_type"] is typing.Any
         assert isinstance(image_upload_metadata["field_info"], FieldInfo)
-        assert image_upload_metadata["field_info"].json_schema_extra == {"format": "image"}
+        assert image_upload_metadata["field_info"].json_schema_extra == {
+            "format": "image"
+        }
 
 
 class TestPydanticIntegration:
@@ -124,13 +136,18 @@ class TestAdvancedUsage:
                     (BaseModel,),
                     {
                         "__annotations__": {"document": FileUpload},
-                        "document": Field(title="Document Upload", description="Upload a document file"),
+                        "document": Field(
+                            title="Document Upload",
+                            description="Upload a document file",
+                        ),
                     },
                 ),
                 lambda model: (
                     model.model_fields["document"].title == "Document Upload",
-                    model.model_fields["document"].description == "Upload a document file",
-                    model.model_fields["document"].json_schema_extra == {"format": "binary"},
+                    model.model_fields["document"].description
+                    == "Upload a document file",
+                    model.model_fields["document"].json_schema_extra
+                    == {"format": "binary"},
                     model.model_fields["document"].annotation is typing.Any,
                 ),
             ),
@@ -141,7 +158,10 @@ class TestAdvancedUsage:
                         "AttachmentModel",
                         (BaseModel,),
                         {
-                            "__annotations__": {"file": FileUpload, "thumbnail": FileUpload | None},
+                            "__annotations__": {
+                                "file": FileUpload,
+                                "thumbnail": FileUpload | None,
+                            },
                             "thumbnail": None,
                         },
                     ),
@@ -149,7 +169,10 @@ class TestAdvancedUsage:
                         "DocumentModel",
                         (BaseModel,),
                         {
-                            "__annotations__": {"title": str, "attachment": type.__call__},  # Placeholder
+                            "__annotations__": {
+                                "title": str,
+                                "attachment": type.__call__,
+                            },  # Placeholder
                         },
                     ),
                 ),
@@ -164,7 +187,10 @@ class TestAdvancedUsage:
                     "TestModel",
                     (BaseModel,),
                     {
-                        "__annotations__": {"documents": list[FileUpload], "images": list[ImageUpload]},
+                        "__annotations__": {
+                            "documents": list[FileUpload],
+                            "images": list[ImageUpload],
+                        },
                         "images": [],
                     },
                 ),
@@ -177,7 +203,9 @@ class TestAdvancedUsage:
             ),
         ],
     )
-    def test_works_in_advanced_pydantic_scenarios(self, scenario, model_factory, assertions):
+    def test_works_in_advanced_pydantic_scenarios(
+        self, scenario, model_factory, assertions
+    ):
         """FileUpload/ImageUpload work with Field customization, nested models, and lists."""
         if scenario == "field_customization":
             model = model_factory()
@@ -288,8 +316,10 @@ class TestUploadedFileWrapper:
 
         from schemaform.types import UploadedFileWrapper
 
-        file = SimpleUploadedFile("test.pdf", b"file content", content_type="application/pdf")
-        wrapper = UploadedFileWrapper(file)
+        file = SimpleUploadedFile(
+            "test.pdf", b"file content", content_type="application/pdf"
+        )
+        wrapper = UploadedFileWrapper(file)  # type: ignore[arg-type]
 
         assert wrapper.name == "test.pdf"
         assert wrapper.size == len(b"file content")

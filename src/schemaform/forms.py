@@ -195,10 +195,14 @@ class SchemaForm(forms.BaseForm, metaclass=SchemaFormMeta):
         file_format = self._get_file_format(field_info)
         if file_format == "binary":
             self._file_field_names.add(field_name)
-            return self._build_file_field(field_name, field_info, forms.FileField, is_optional)
+            return self._build_file_field(
+                field_name, field_info, forms.FileField, is_optional
+            )
         elif file_format == "image":
             self._file_field_names.add(field_name)
-            return self._build_file_field(field_name, field_info, forms.ImageField, is_optional)
+            return self._build_file_field(
+                field_name, field_info, forms.ImageField, is_optional
+            )
 
         # Detect choice fields (Literal or Enum)
         choices = self._detect_choices(core_type)
@@ -208,7 +212,9 @@ class SchemaForm(forms.BaseForm, metaclass=SchemaFormMeta):
             field_class = self._get_field_class(core_type)
 
         # Build kwargs
-        kwargs = self._build_field_kwargs(field_name, field_info, field_class, is_optional)
+        kwargs = self._build_field_kwargs(
+            field_name, field_info, field_class, is_optional
+        )
 
         if choices is not None:
             # Add empty choice for optional fields
@@ -229,8 +235,10 @@ class SchemaForm(forms.BaseForm, metaclass=SchemaFormMeta):
         field = field_class(**kwargs)
 
         # Apply step attribute to numeric field widgets
-        if step is not None and isinstance(field, (forms.IntegerField, forms.FloatField, forms.DecimalField)):
-            field.widget.attrs["step"] = step
+        if step is not None and isinstance(
+            field, (forms.IntegerField, forms.FloatField, forms.DecimalField)
+        ):
+            field.widget.attrs["step"] = step  # type: ignore[attr-defined]
 
         # Apply widget customizations (pass core_type for datetime constraints)
         field = self._customize_widget(field, core_type)
@@ -246,7 +254,9 @@ class SchemaForm(forms.BaseForm, metaclass=SchemaFormMeta):
     ) -> forms.Field:
         """Build a file or image field."""
         kwargs = {
-            "label": field_info.alias or field_info.title or field_name.replace("_", " ").title(),
+            "label": field_info.alias
+            or field_info.title
+            or field_name.replace("_", " ").title(),
             "help_text": field_info.description or "",
             "required": not is_optional and field_info.is_required(),
         }
@@ -268,7 +278,9 @@ class SchemaForm(forms.BaseForm, metaclass=SchemaFormMeta):
             required = field_info.is_required() and not is_optional
 
         return {
-            "label": field_info.alias or field_info.title or field_name.replace("_", " ").title(),
+            "label": field_info.alias
+            or field_info.title
+            or field_name.replace("_", " ").title(),
             "help_text": field_info.description or "",
             "required": required,
         }
@@ -298,6 +310,7 @@ class SchemaForm(forms.BaseForm, metaclass=SchemaFormMeta):
 
         # For optional Annotated types (FileUpload | None), check the Union args
         import typing
+
         args = typing.get_args(field_info.annotation)
         if args:
             # Check first arg (should be the Annotated type)
@@ -310,9 +323,13 @@ class SchemaForm(forms.BaseForm, metaclass=SchemaFormMeta):
                             return fmt
         return None
 
-    def _customize_widget(self, field: forms.Field, core_type: Any = None) -> forms.Field:
+    def _customize_widget(
+        self, field: forms.Field, core_type: Any = None
+    ) -> forms.Field:
         """Apply widget customizations for specific field types."""
-        if isinstance(field, forms.DateField) and not isinstance(field, forms.DateTimeField):
+        if isinstance(field, forms.DateField) and not isinstance(
+            field, forms.DateTimeField
+        ):
             attrs = {"type": "date"}
             attrs.update(self._get_datetime_min_max_attrs(core_type))
             field.widget = forms.DateInput(attrs=attrs)
@@ -381,7 +398,10 @@ class SchemaForm(forms.BaseForm, metaclass=SchemaFormMeta):
 
         # Enum subclass
         if isinstance(annotation, type) and issubclass(annotation, Enum):
-            return [(member.value, member.name.replace("_", " ").title()) for member in annotation]
+            return [
+                (member.value, member.name.replace("_", " ").title())
+                for member in annotation
+            ]
 
         return None
 
@@ -440,7 +460,7 @@ class SchemaForm(forms.BaseForm, metaclass=SchemaFormMeta):
                     value = field._clean_bound_field(bf)
                     self.cleaned_data[name] = value
                     if hasattr(self, f"clean_{name}"):
-                        value = getattr(self, f"clean_{name}")() 
+                        value = getattr(self, f"clean_{name}")()
                         self.cleaned_data[name] = value
                 except forms.ValidationError as e:
                     self.add_error(name, e)

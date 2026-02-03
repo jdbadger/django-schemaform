@@ -44,14 +44,22 @@ class ContactRequest(BaseSchema):
 
     name: str = Field(min_length=2, max_length=100, description="Your full name")
     email: EmailStr = Field(description="We'll never share your email")
-    phone: str | None = Field(default=None, max_length=20, description="Optional phone number")
+    phone: str | None = Field(
+        default=None, max_length=20, description="Optional phone number"
+    )
     preferred_contact: Literal["email", "phone", "either"] = Field(
         default="email", description="How should we reach you?"
     )
-    preferred_time: time | None = Field(default=None, description="Best time to contact you")
+    preferred_time: time | None = Field(
+        default=None, description="Best time to contact you"
+    )
     subject: str = Field(min_length=5, max_length=200)
-    message: str = Field(min_length=20, max_length=5000, description="Tell us how we can help")
-    urgent: bool = Field(default=False, description="Check if this requires immediate attention")
+    message: str = Field(
+        min_length=20, max_length=5000, description="Tell us how we can help"
+    )
+    urgent: bool = Field(
+        default=False, description="Check if this requires immediate attention"
+    )
 
 
 # =============================================================================
@@ -82,7 +90,9 @@ class UserRegistration(BaseSchema):
         password = self.password.get_secret_value()
         password_confirm = self.password_confirm.get_secret_value()
         if password != password_confirm:
-            raise ValueError("Passwords do not match. Please enter the same password in both fields.")
+            raise ValueError(
+                "Passwords do not match. Please enter the same password in both fields."
+            )
 
         # Check terms accepted
         if not self.accepted_terms:
@@ -116,11 +126,13 @@ class EventBooking(BaseSchema):
     event_date: date = Field(description="When should the event take place?")
     start_time: time = Field(description="Event start time")
     end_time: time = Field(description="Event end time")
-    event_type: Literal["conference", "wedding", "birthday", "corporate", "other"] = Field(
-        description="Type of event"
+    event_type: Literal["conference", "wedding", "birthday", "corporate", "other"] = (
+        Field(description="Type of event")
     )
     guest_count: int = Field(ge=1, le=500, description="Number of guests (1-500)")
-    room_preference: RoomType | None = Field(default=None, description="Preferred venue room")
+    room_preference: RoomType | None = Field(
+        default=None, description="Preferred venue room"
+    )
     budget: Decimal = Field(
         ge=Decimal("100.00"),
         max_digits=10,
@@ -130,7 +142,9 @@ class EventBooking(BaseSchema):
     special_requests: str | None = Field(
         default=None, max_length=500, description="Dietary needs, accessibility, etc."
     )
-    needs_catering: bool = Field(default=False, description="Include catering services?")
+    needs_catering: bool = Field(
+        default=False, description="Include catering services?"
+    )
 
     @model_validator(mode="after")
     def validate_times(self) -> "EventBooking":
@@ -150,13 +164,21 @@ class ProductReview(BaseSchema):
 
     product_id: UUID = Field(description="Product identifier")
     rating: int = Field(ge=1, le=5, description="Rate from 1 to 5 stars")
-    title: str = Field(min_length=5, max_length=100, description="Summarize your experience")
+    title: str = Field(
+        min_length=5, max_length=100, description="Summarize your experience"
+    )
     review_text: str = Field(
-        min_length=20, max_length=2000, description="Share details about your experience"
+        min_length=20,
+        max_length=2000,
+        description="Share details about your experience",
     )
     recommend: bool = Field(description="Would you recommend this product?")
-    verified_purchase: bool = Field(default=False, description="I purchased this product")
-    photo: ImageUpload | None = Field(default=None, description="Add a photo of the product")
+    verified_purchase: bool = Field(
+        default=False, description="I purchased this product"
+    )
+    photo: ImageUpload | None = Field(
+        default=None, description="Add a photo of the product"
+    )
 
 
 # =============================================================================
@@ -183,14 +205,24 @@ class JobApplication(BaseSchema):
     - Resume must be under 5MB
     """
 
-    full_name: str = Field(min_length=2, max_length=100, description="Your full legal name")
+    full_name: str = Field(
+        min_length=2, max_length=100, description="Your full legal name"
+    )
     email: EmailStr = Field(description="Professional email address")
     phone: str = Field(min_length=10, max_length=20, description="Contact phone number")
-    experience_level: ExperienceLevel = Field(description="Your current experience level")
+    experience_level: ExperienceLevel = Field(
+        description="Your current experience level"
+    )
     resume: FileUpload = Field(description="Upload your resume (PDF preferred)")
-    photo: ImageUpload | None = Field(default=None, description="Professional headshot (optional)")
-    portfolio_url: HttpUrl | None = Field(default=None, description="Link to your portfolio")
-    linkedin_url: HttpUrl | None = Field(default=None, description="LinkedIn profile URL")
+    photo: ImageUpload | None = Field(
+        default=None, description="Professional headshot (optional)"
+    )
+    portfolio_url: HttpUrl | None = Field(
+        default=None, description="Link to your portfolio"
+    )
+    linkedin_url: HttpUrl | None = Field(
+        default=None, description="LinkedIn profile URL"
+    )
     available_from: date = Field(description="Earliest start date")
     expected_salary: Decimal = Field(
         ge=Decimal("0"),
@@ -199,7 +231,9 @@ class JobApplication(BaseSchema):
         description="Expected annual salary in USD",
     )
     cover_letter: str | None = Field(
-        default=None, max_length=2000, description="Why are you interested in this position?"
+        default=None,
+        max_length=2000,
+        description="Why are you interested in this position?",
     )
 
     @field_validator("resume")
@@ -217,7 +251,9 @@ class JobApplication(BaseSchema):
         # Check file extension
         allowed_extensions = (".pdf", ".doc", ".docx")
         if not v.name.lower().endswith(allowed_extensions):
-            raise ValueError("Resume must be a PDF or Word document (.pdf, .doc, .docx).")
+            raise ValueError(
+                "Resume must be a PDF or Word document (.pdf, .doc, .docx)."
+            )
 
         return v
 
@@ -242,10 +278,14 @@ class MedicalDepartment(str, Enum):
 class MedicalAppointment(BaseSchema):
     """Medical appointment scheduling with patient information."""
 
-    patient_name: str = Field(min_length=2, max_length=100, description="Patient's full name")
+    patient_name: str = Field(
+        min_length=2, max_length=100, description="Patient's full name"
+    )
     date_of_birth: PastDate = Field(description="Patient's date of birth")
     email: EmailStr = Field(description="Email for appointment confirmation")
-    phone: str = Field(min_length=10, max_length=20, description="Emergency contact number")
+    phone: str = Field(
+        min_length=10, max_length=20, description="Emergency contact number"
+    )
     department: MedicalDepartment = Field(description="Medical department")
     preferred_datetime: FutureDatetime = Field(
         description="Preferred appointment date and time (must be in the future)"

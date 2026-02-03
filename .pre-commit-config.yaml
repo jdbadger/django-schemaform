@@ -23,7 +23,7 @@ repos:
     hooks:
       - id: pytest
         name: pytest with testmon
-        entry: uv run --group test pytest
+        entry: uv run --group dev pytest
         args: ["--testmon"]
         language: system
         pass_filenames: false

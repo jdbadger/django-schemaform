@@ -41,6 +41,7 @@ class SampleSchemaFormInitialization:
 
     def test_should_raise_value_error_when_no_schema_defined(self):
         """SchemaForm without schema in Meta should raise ValueError."""
+
         # Arrange
         class NoSchemaForm(SchemaForm):
             class Meta:
@@ -52,6 +53,7 @@ class SampleSchemaFormInitialization:
 
     def test_should_raise_value_error_when_schema_not_basemodel(self):
         """SchemaForm with non-BaseModel schema should raise ValueError."""
+
         # Arrange
         class NotAModel:
             pass
@@ -132,6 +134,7 @@ class TestFieldTypeMapping:
 
     def test_should_handle_type_subclasses(self):
         """Custom type subclasses should map to parent type's field."""
+
         # Arrange
         class CustomStr(str):
             pass
@@ -146,6 +149,7 @@ class TestFieldTypeMapping:
 
     def test_should_fallback_to_charfield_for_unknown_types(self):
         """Unknown types should fallback to CharField."""
+
         # Arrange
         class UnknownType:
             pass
@@ -666,6 +670,7 @@ class TestPydanticValidation:
 
     def test_should_validate_valid_data(self):
         """Valid data should pass Pydantic validation."""
+
         # Arrange
         class RequiredStringSchema(BaseModel):
             name: str
@@ -685,6 +690,7 @@ class TestPydanticValidation:
 
     def test_should_report_missing_required_field(self):
         """Missing required field should add error."""
+
         # Arrange
         class RequiredStringSchema(BaseModel):
             name: str
@@ -716,6 +722,7 @@ class TestPydanticValidation:
 
     def test_should_coerce_types_via_pydantic(self):
         """Pydantic should coerce string inputs to correct types."""
+
         # Arrange
         class TypedSchema(BaseModel):
             count: int
@@ -737,6 +744,7 @@ class TestPydanticValidation:
 
     def test_should_validate_constraints(self):
         """Constraint violations should add errors."""
+
         # Arrange
         class ConstrainedSchema(BaseModel):
             name: str = Field(min_length=3)
@@ -767,7 +775,19 @@ class TestErrorConversion:
         """Missing field error should convert to 'This field is required.'"""
         # Arrange
         form = SampleSchemaForm()
-        error = {"loc": ("name",), "type": "missing", "ctx": {}, "msg": "Field required"}
+        from typing import cast
+
+        from pydantic_core import ErrorDetails
+
+        error = cast(
+            ErrorDetails,
+            {
+                "loc": ("name",),
+                "type": "missing",
+                "ctx": {},
+                "msg": "Field required",
+            },
+        )
 
         # Act
         field_name, message = form._convert_pydantic_error(error)
@@ -779,13 +799,20 @@ class TestErrorConversion:
     def test_should_convert_string_too_short_with_context(self):
         """String too short error should interpolate min_length."""
         # Arrange
+        from typing import cast
+
+        from pydantic_core import ErrorDetails
+
         form = SampleSchemaForm()
-        error = {
-            "loc": ("name",),
-            "type": "string_too_short",
-            "ctx": {"min_length": 3},
-            "msg": "String should have at least 3 characters",
-        }
+        error = cast(
+            ErrorDetails,
+            {
+                "loc": ("name",),
+                "type": "string_too_short",
+                "ctx": {"min_length": 3},
+                "msg": "String should have at least 3 characters",
+            },
+        )
 
         # Act
         field_name, message = form._convert_pydantic_error(error)
@@ -796,13 +823,20 @@ class TestErrorConversion:
     def test_should_convert_string_too_long_with_context(self):
         """String too long error should interpolate max_length."""
         # Arrange
+        from typing import cast
+
+        from pydantic_core import ErrorDetails
+
         form = SampleSchemaForm()
-        error = {
-            "loc": ("name",),
-            "type": "string_too_long",
-            "ctx": {"max_length": 100},
-            "msg": "String should have at most 100 characters",
-        }
+        error = cast(
+            ErrorDetails,
+            {
+                "loc": ("name",),
+                "type": "string_too_long",
+                "ctx": {"max_length": 100},
+                "msg": "String should have at most 100 characters",
+            },
+        )
 
         # Act
         field_name, message = form._convert_pydantic_error(error)
@@ -813,13 +847,20 @@ class TestErrorConversion:
     def test_should_convert_numeric_constraint_errors(self):
         """Numeric constraint errors should interpolate correctly."""
         # Arrange
+        from typing import cast
+
+        from pydantic_core import ErrorDetails
+
         form = SampleSchemaForm()
-        error = {
-            "loc": ("age",),
-            "type": "greater_than_equal",
-            "ctx": {"ge": 0},
-            "msg": "Input should be greater than or equal to 0",
-        }
+        error = cast(
+            ErrorDetails,
+            {
+                "loc": ("age",),
+                "type": "greater_than_equal",
+                "ctx": {"ge": 0},
+                "msg": "Input should be greater than or equal to 0",
+            },
+        )
 
         # Act
         field_name, message = form._convert_pydantic_error(error)
@@ -830,13 +871,20 @@ class TestErrorConversion:
     def test_should_fallback_to_pydantic_message_for_unknown_error(self):
         """Unknown error types should use Pydantic's message."""
         # Arrange
+        from typing import cast
+
+        from pydantic_core import ErrorDetails
+
         form = SampleSchemaForm()
-        error = {
-            "loc": ("field",),
-            "type": "custom_unknown_error",
-            "ctx": {},
-            "msg": "Custom error message",
-        }
+        error = cast(
+            ErrorDetails,
+            {
+                "loc": ("field",),
+                "type": "custom_unknown_error",
+                "ctx": {},
+                "msg": "Custom error message",
+            },
+        )
 
         # Act
         field_name, message = form._convert_pydantic_error(error)
@@ -860,11 +908,25 @@ class TestErrorConversion:
             ("enum", "Select a valid choice."),
         ],
     )
-    def test_should_convert_all_pydantic_error_types(self, error_type, expected_message):
+    def test_should_convert_all_pydantic_error_types(
+        self, error_type, expected_message
+    ):
         """All PYDANTIC_ERROR_MESSAGES entries should convert correctly."""
         # Arrange
+        from typing import cast
+
+        from pydantic_core import ErrorDetails
+
         form = SampleSchemaForm()
-        error = {"loc": ("field",), "type": error_type, "ctx": {}, "msg": "Pydantic message"}
+        error = cast(
+            ErrorDetails,
+            {
+                "loc": ("field",),
+                "type": error_type,
+                "ctx": {},
+                "msg": "Pydantic message",
+            },
+        )
 
         # Act
         field_name, message = form._convert_pydantic_error(error)
@@ -892,6 +954,7 @@ class TestRequiredFields:
 
     def test_required_fields_should_be_required(self):
         """Required fields should have required=True."""
+
         # Arrange
         class RequiredSchema(BaseModel):
             name: str
@@ -909,6 +972,7 @@ class TestRequiredFields:
 
     def test_field_with_default_should_not_be_required(self):
         """Fields with defaults should not be required."""
+
         # Arrange
         class DefaultSchema(BaseModel):
             name: str = "default"
@@ -945,6 +1009,7 @@ class TestBooleanFieldHandling:
 
     def test_required_boolean_should_be_required(self):
         """Required boolean field should be required."""
+
         # Arrange
         class RequiredBoolSchema(BaseModel):
             accepted: bool
@@ -972,6 +1037,7 @@ class TestRequiredChoiceFields:
 
     def test_required_literal_should_not_have_empty_choice(self):
         """Required Literal field should not have empty choice."""
+
         # Arrange
         class RequiredLiteralSchema(BaseModel):
             status: Literal["active", "inactive"]
@@ -992,6 +1058,7 @@ class TestRequiredChoiceFields:
 
     def test_required_enum_should_not_have_empty_choice(self):
         """Required Enum field should not have empty choice."""
+
         # Arrange
         class RequiredEnumSchema(BaseModel):
             option: SampleEnum
@@ -1050,6 +1117,7 @@ class TestDirectFieldConstraints:
 
     def test_should_extract_ge_from_field_info(self):
         """ge constraint from Field() should set min_value."""
+
         # Arrange
         class GeSchema(BaseModel):
             value: int = Field(ge=5)
@@ -1068,6 +1136,7 @@ class TestDirectFieldConstraints:
 
     def test_should_extract_gt_from_field_info(self):
         """gt constraint from Field() should set min_value."""
+
         # Arrange
         class GtSchema(BaseModel):
             value: int = Field(gt=0)
@@ -1086,6 +1155,7 @@ class TestDirectFieldConstraints:
 
     def test_should_extract_le_from_field_info(self):
         """le constraint from Field() should set max_value."""
+
         # Arrange
         class LeSchema(BaseModel):
             value: int = Field(le=100)
@@ -1104,6 +1174,7 @@ class TestDirectFieldConstraints:
 
     def test_should_extract_lt_from_field_info(self):
         """lt constraint from Field() should set max_value."""
+
         # Arrange
         class LtSchema(BaseModel):
             value: int = Field(lt=10)
@@ -1122,6 +1193,7 @@ class TestDirectFieldConstraints:
 
     def test_should_extract_min_length_from_field_info(self):
         """min_length constraint from Field() should be extracted."""
+
         # Arrange
         class MinLenSchema(BaseModel):
             value: str = Field(min_length=3)
@@ -1140,6 +1212,7 @@ class TestDirectFieldConstraints:
 
     def test_should_extract_max_length_from_field_info(self):
         """max_length constraint from Field() should be extracted."""
+
         # Arrange
         class MaxLenSchema(BaseModel):
             value: str = Field(max_length=50)
@@ -1158,6 +1231,7 @@ class TestDirectFieldConstraints:
 
     def test_should_extract_decimal_constraints_from_field_info(self):
         """max_digits and decimal_places from Field() should be extracted."""
+
         # Arrange
         class DecimalSchema(BaseModel):
             value: Decimal = Field(max_digits=8, decimal_places=2)
@@ -1177,6 +1251,7 @@ class TestDirectFieldConstraints:
 
     def test_should_extract_multiple_of_from_field_info(self):
         """multiple_of from Field() should set step attribute."""
+
         # Arrange
         class StepSchema(BaseModel):
             value: int = Field(multiple_of=5)
@@ -1204,6 +1279,7 @@ class TestFileFieldCleanMethods:
 
     def test_clean_method_called_for_file_field(self):
         """Custom clean_<fieldname> should be called for file fields."""
+
         # Arrange
         class FileSchema(BaseModel):
             document: FileUpload
@@ -1218,7 +1294,9 @@ class TestFileFieldCleanMethods:
                     raise forms.ValidationError("Forbidden file")
                 return value
 
-        file = SimpleUploadedFile("test.pdf", b"content", content_type="application/pdf")
+        file = SimpleUploadedFile(
+            "test.pdf", b"content", content_type="application/pdf"
+        )
         form = FileFormWithClean(data={}, files={"document": file})
 
         # Act
@@ -1230,6 +1308,7 @@ class TestFileFieldCleanMethods:
 
     def test_clean_method_validation_error_for_file_field(self):
         """Validation error in clean_<fieldname> should add error."""
+
         # Arrange
         class FileSchema(BaseModel):
             document: FileUpload
@@ -1244,7 +1323,9 @@ class TestFileFieldCleanMethods:
                     raise forms.ValidationError("Forbidden file")
                 return value
 
-        file = SimpleUploadedFile("forbidden.pdf", b"content", content_type="application/pdf")
+        file = SimpleUploadedFile(
+            "forbidden.pdf", b"content", content_type="application/pdf"
+        )
         form = FileFormWithClean(data={}, files={"document": file})
 
         # Act
@@ -1270,7 +1351,6 @@ class TestFileFieldPydanticValidation:
 
         from pydantic import model_validator
 
-
         class RequestType(str, Enum):
             TIME_OFF = "time_off"
             REIMBURSEMENT = "reimbursement"
@@ -1283,14 +1363,18 @@ class TestFileFieldPydanticValidation:
             def validate_receipt_required(self) -> "RequestSchema":
                 if self.request_type == RequestType.REIMBURSEMENT:
                     if not self.receipt:
-                        raise ValueError("Receipt is required for reimbursement requests")
+                        raise ValueError(
+                            "Receipt is required for reimbursement requests"
+                        )
                 return self
 
         class RequestForm(SchemaForm):
             class Meta:
                 schema = RequestSchema
 
-        file = SimpleUploadedFile("receipt.pdf", b"file data", content_type="application/pdf")
+        file = SimpleUploadedFile(
+            "receipt.pdf", b"file data", content_type="application/pdf"
+        )
         form = RequestForm(
             data={"request_type": "reimbursement"},
             files={"receipt": file},
@@ -1321,7 +1405,9 @@ class TestFileFieldPydanticValidation:
             def validate_receipt_required(self) -> "RequestSchema":
                 if self.request_type == RequestType.REIMBURSEMENT:
                     if not self.receipt:
-                        raise ValueError("Receipt is required for reimbursement requests")
+                        raise ValueError(
+                            "Receipt is required for reimbursement requests"
+                        )
                 return self
 
         class RequestForm(SchemaForm):
@@ -1360,7 +1446,9 @@ class TestFileFieldPydanticValidation:
             class Meta:
                 schema = DocumentSchema
 
-        large_file = SimpleUploadedFile("large.pdf", b"x" * 200, content_type="application/pdf")
+        large_file = SimpleUploadedFile(
+            "large.pdf", b"x" * 200, content_type="application/pdf"
+        )
         form = DocumentForm(data={}, files={"document": large_file})
 
         # Act
@@ -1390,7 +1478,9 @@ class TestFileFieldPydanticValidation:
             class Meta:
                 schema = DocumentSchema
 
-        wrong_type = SimpleUploadedFile("file.exe", b"content", content_type="application/octet-stream")
+        wrong_type = SimpleUploadedFile(
+            "file.exe", b"content", content_type="application/octet-stream"
+        )
         form = DocumentForm(data={}, files={"document": wrong_type})
 
         # Act
@@ -1420,7 +1510,9 @@ class TestFileFieldPydanticValidation:
             class Meta:
                 schema = DocumentSchema
 
-        wrong_type = SimpleUploadedFile("file.txt", b"text content", content_type="text/plain")
+        wrong_type = SimpleUploadedFile(
+            "file.txt", b"text content", content_type="text/plain"
+        )
         form = DocumentForm(data={}, files={"document": wrong_type})
 
         # Act
@@ -1448,7 +1540,9 @@ class TestFileFieldPydanticValidation:
             class Meta:
                 schema = DocumentSchema
 
-        file = SimpleUploadedFile("test.pdf", b"content", content_type="application/pdf")
+        file = SimpleUploadedFile(
+            "test.pdf", b"content", content_type="application/pdf"
+        )
         form = DocumentForm(data={}, files={"document": file})
 
         # Act
@@ -1501,7 +1595,9 @@ class TestFileFieldPydanticValidation:
             class Meta:
                 schema = FileSchema
 
-        file = SimpleUploadedFile("test.pdf", b"content", content_type="application/pdf")
+        file = SimpleUploadedFile(
+            "test.pdf", b"content", content_type="application/pdf"
+        )
         form = FileForm(data={}, files={"document": file})
 
         # Act
@@ -1532,8 +1628,12 @@ class TestFileFieldPydanticValidation:
             class Meta:
                 schema = MultiFileSchema
 
-        resume = SimpleUploadedFile("resume.pdf", b"x" * 300, content_type="application/pdf")
-        cover = SimpleUploadedFile("cover.pdf", b"x" * 300, content_type="application/pdf")
+        resume = SimpleUploadedFile(
+            "resume.pdf", b"x" * 300, content_type="application/pdf"
+        )
+        cover = SimpleUploadedFile(
+            "cover.pdf", b"x" * 300, content_type="application/pdf"
+        )
         form = MultiFileForm(data={}, files={"resume": resume, "cover_letter": cover})
 
         # Act
@@ -1578,6 +1678,7 @@ class TestPostCleanHook:
 
     def test_post_clean_can_add_validation_errors(self):
         """_post_clean can add cross-field validation errors."""
+
         # Arrange
         class RangeSchema(BaseModel):
             min_val: int
@@ -1614,7 +1715,9 @@ class TestWidgetRenderingBrowser:
 
     # --- Date/Time Widgets ---
 
-    def test_should_render_date_input_with_type_date(self, render_form_to_file, page_from_file):
+    def test_should_render_date_input_with_type_date(
+        self, render_form_to_file, page_from_file
+    ):
         """DateField should render as <input type="date"> in the browser."""
         # Arrange
         form = SampleSchemaForm()
@@ -1642,7 +1745,9 @@ class TestWidgetRenderingBrowser:
         # Assert
         assert input_element.get_attribute("type") == "datetime-local"
 
-    def test_should_render_time_input_with_type_time(self, render_form_to_file, page_from_file):
+    def test_should_render_time_input_with_type_time(
+        self, render_form_to_file, page_from_file
+    ):
         """TimeField should render as <input type="time"> in the browser."""
         # Arrange
         form = SampleSchemaForm()
@@ -1657,7 +1762,9 @@ class TestWidgetRenderingBrowser:
 
     # --- Constrained Date/Datetime min/max Attributes ---
 
-    def test_should_render_past_date_with_max_attribute(self, render_form_to_file, page_from_file):
+    def test_should_render_past_date_with_max_attribute(
+        self, render_form_to_file, page_from_file
+    ):
         """PastDate field should render with max attribute set to today."""
         # Arrange
         with patch("schemaform.forms.date") as mock_date:
@@ -1778,7 +1885,9 @@ class TestWidgetRenderingBrowser:
 
     # --- Choice/Select Widgets ---
 
-    def test_should_render_select_for_literal_field(self, render_form_to_file, page_from_file):
+    def test_should_render_select_for_literal_field(
+        self, render_form_to_file, page_from_file
+    ):
         """Literal field should render as <select> with options."""
         # Arrange
         form = SampleSchemaForm()
@@ -1796,7 +1905,9 @@ class TestWidgetRenderingBrowser:
         # First option should be empty (for optional field)
         assert options.nth(0).get_attribute("value") == ""
 
-    def test_should_render_select_for_enum_field(self, render_form_to_file, page_from_file):
+    def test_should_render_select_for_enum_field(
+        self, render_form_to_file, page_from_file
+    ):
         """Enum field should render as <select> with options from enum values."""
         # Arrange
         form = SampleSchemaForm()
@@ -1816,6 +1927,7 @@ class TestWidgetRenderingBrowser:
         self, render_form_to_file, page_from_file
     ):
         """Required choice field should not have empty option."""
+
         # Arrange
         class RequiredChoiceSchema(BaseModel):
             status: Literal["active", "inactive"]
@@ -1839,7 +1951,9 @@ class TestWidgetRenderingBrowser:
 
     # --- File/Image Widgets ---
 
-    def test_should_render_file_input_for_file_field(self, render_form_to_file, page_from_file):
+    def test_should_render_file_input_for_file_field(
+        self, render_form_to_file, page_from_file
+    ):
         """FileUpload field should render as <input type="file">."""
         # Arrange
         form = SampleSchemaForm()
@@ -1852,7 +1966,9 @@ class TestWidgetRenderingBrowser:
         # Assert
         assert input_element.get_attribute("type") == "file"
 
-    def test_should_render_file_input_for_image_field(self, render_form_to_file, page_from_file):
+    def test_should_render_file_input_for_image_field(
+        self, render_form_to_file, page_from_file
+    ):
         """ImageUpload field should render as <input type="file">."""
         # Arrange
         form = SampleSchemaForm()
@@ -1867,7 +1983,9 @@ class TestWidgetRenderingBrowser:
 
     # --- Label and Help Text ---
 
-    def test_should_render_label_from_field_title(self, render_form_to_file, page_from_file):
+    def test_should_render_label_from_field_title(
+        self, render_form_to_file, page_from_file
+    ):
         """Field with title should render label with custom title text."""
         # Arrange
         form = SampleSchemaForm()
@@ -1880,7 +1998,9 @@ class TestWidgetRenderingBrowser:
         # Assert
         assert "Custom Title" in label_element.text_content()
 
-    def test_should_render_help_text_from_description(self, render_form_to_file, page_from_file):
+    def test_should_render_help_text_from_description(
+        self, render_form_to_file, page_from_file
+    ):
         """Field with description should render help text."""
         # Arrange
         form = SampleSchemaForm()

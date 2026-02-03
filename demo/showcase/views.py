@@ -74,6 +74,8 @@ class BaseSchemaFormView(FormView):
 
     template_name = "showcase/form.html"
     schema_class = None
+    form_title: str = ""
+    form_description: str = ""
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -110,7 +112,9 @@ class ContactFormView(BaseSchemaFormView):
     schema_class = ContactRequest
     success_url = reverse_lazy("showcase:contact-success")
     form_title = "Contact Form"
-    form_description = "A simple contact form with email, phone preference, and message fields."
+    form_description = (
+        "A simple contact form with email, phone preference, and message fields."
+    )
 
 
 class UserRegistrationFormView(BaseSchemaFormView):
@@ -140,7 +144,9 @@ class ProductReviewFormView(BaseSchemaFormView):
     schema_class = ProductReview
     success_url = reverse_lazy("showcase:review-success")
     form_title = "Product Review"
-    form_description = "Submit product reviews with 1-5 star rating, review text, and optional photo."
+    form_description = (
+        "Submit product reviews with 1-5 star rating, review text, and optional photo."
+    )
 
 
 class JobApplicationFormView(BaseSchemaFormView):
