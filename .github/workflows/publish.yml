@@ -24,7 +24,7 @@ jobs:
         run: uv build
       
       - name: Smoke test (wheel)
-        run: uv run --isolated --no-project --with dist/*.whl python -c "import schemaform; print(f'django_schemaform v{django_schemaform.__version__}')"
+        run: uv run --isolated --no-project --with dist/*.whl python -c "import schemaform; print(f'django-schemaform v{schemaform.__version__}')"
       
       - name: Upload distributions
         uses: actions/upload-artifact@v4
