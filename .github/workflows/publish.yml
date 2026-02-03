@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/django_schemaform
+      url: https://test.pypi.org/p/django-schemaform
     permissions:
       id-token: write
     steps:
@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/django_schemaform
+      url: https://pypi.org/p/django-schemaform
     permissions:
       id-token: write
     steps:
