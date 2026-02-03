@@ -1,6 +1,8 @@
-<p align="center">
-  <img src="assets/djangoschemaform.png" alt="django-schemaform" width="400">
-</p>
+<div align="center">
+  <picture>
+    <img src="https://raw.githubusercontent.com/jdbadger/django-schemaform/main/assets/djangoschemaform.png" alt="Django SchemaForm Logo">
+  </picture>
+</div>
 
 <p align="center">
   <strong>Django forms from Pydantic models</strong>
